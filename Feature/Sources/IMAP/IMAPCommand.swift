@@ -17,8 +17,6 @@ extension IMAPCommand {
 
     // MARK: IMAPCommand
     var timeout: Int64 { 30 }  // Practical default
-
-    // MARK: CustomStringConvertible
     var description: String { "\(name) command" }
 }
 

@@ -58,7 +58,7 @@ public class IMAPClient {
         let capabilities: [Capability] = try await execute(command: LoginCommand(username: username, password: password))
         if !capabilities.isEmpty {
             // IMAP servers can return _additional_ capabilities after login
-            logger?.info("Mergina capabilities…")
+            logger?.info("Merging capabilities…")
             for capability in capabilities {
                 self.capabilities.insert(capability)
             }
