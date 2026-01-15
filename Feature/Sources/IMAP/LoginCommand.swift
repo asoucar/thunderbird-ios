@@ -12,7 +12,7 @@ struct LoginCommand: IMAPCommand {
 
     // MARK: IMAPCommand
     typealias Result = [Capability]
-    typealias Handler = LoginHandler
+    typealias Handler = CapabilityHandler
 
     static var name: String { "login" }
 
@@ -20,5 +20,3 @@ struct LoginCommand: IMAPCommand {
         TaggedCommand(tag: tag, command: .login(username: username, password: password))
     }
 }
-
-typealias LoginHandler = CapabilityHandler

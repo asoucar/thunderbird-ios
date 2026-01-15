@@ -2,32 +2,35 @@
 import Testing
 
 struct IMAPClientTests {
-    @Test(.disabled(if: Server.server.password.isEmpty)) func connect() async throws {
+    @Test(.disabled(if: Server.server.isDisabled)) func connect() async throws {
         let client: IMAPClient = IMAPClient(.server)
         try await client.connect()
         #expect(client.isConnected == true)
         await #expect(throws: IMAPError.alreadyConnected) {
             try await client.connect()
         }
-        try client.disconnect()
+        try? client.disconnect()
     }
 
-    @Test(.disabled(if: Server.server.password.isEmpty)) func login() async throws {
-        let client: IMAPClient = IMAPClient(.server)
-        try await client.connect()
-        #expect(client.isConnected == true)
-        try await client.login()
-    }
-
-    @Test(.disabled(if: Server.server.password.isEmpty)) func logout() async throws {
+    @Test(.disabled(if: Server.server.isDisabled)) func login() async throws {
         let client: IMAPClient = IMAPClient(.server)
         try await client.connect()
         #expect(client.isConnected == true)
         try await client.login()
         try await client.logout()
+        try? client.disconnect()
     }
 
-    @Test(.disabled(if: Server.server.password.isEmpty)) func disconnect() async throws {
+    @Test(.disabled(if: Server.server.isDisabled)) func logout() async throws {
+        let client: IMAPClient = IMAPClient(.server)
+        try await client.connect()
+        #expect(client.isConnected == true)
+        try await client.login()
+        try await client.logout()
+        try? client.disconnect()
+    }
+
+    @Test(.disabled(if: Server.server.isDisabled)) func disconnect() async throws {
         let client: IMAPClient = IMAPClient(.server)
         #expect(throws: IMAPError.notConnected) {
             try client.disconnect()
@@ -55,8 +58,8 @@ struct IMAPClientTests {
 }
 
 // Catch when password is being leaked
-@Test func emptyPassword() {
-    #expect(Server.server.password == "")
+@Test func isDisabled() {
+    #expect(Server.server.isDisabled == true)
 }
 
 private extension Server {
@@ -64,9 +67,11 @@ private extension Server {
         Self(
             .tls,
             hostname: "imap.mail.me.com",
-            username: "toddheasley@icloud.com",
-            password: "",
+            username: nil,
+            password: nil,
             port: 993
         )
     }
+
+    var isDisabled: Bool { (password ?? "").isEmpty }
 }

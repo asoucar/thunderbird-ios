@@ -1,6 +1,7 @@
 import NIOCore
 import NIOIMAP
 
+// Fetch advertised server capabilities
 struct CapabilityCommand: IMAPCommand {
 
     // MARK: IMAPCommand

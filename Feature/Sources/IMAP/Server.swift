@@ -2,15 +2,15 @@
 public struct Server: CustomStringConvertible, Equatable, Sendable {
     public let connectionSecurity: ConnectionSecurity
     public let hostname: String
-    public let username: String
-    public let password: String
+    public let username: String?
+    public let password: String?
     public let port: Int
 
     public init(
         _ connectionSecurity: ConnectionSecurity = .tls,
         hostname: String,
-        username: String,
-        password: String,
+        username: String? = nil,
+        password: String? = nil,
         port: Int = 993
     ) {
         self.connectionSecurity = connectionSecurity

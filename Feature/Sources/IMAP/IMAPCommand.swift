@@ -3,6 +3,7 @@ import MIME
 import NIOCore
 import NIOIMAP
 
+// Bundle NIO IMAP commands with a corresponding result type and handler
 protocol IMAPCommand: CustomStringConvertible, Equatable where Result: Sendable {
     associatedtype Result
     associatedtype Handler: IMAPCommandHandler where Handler.Result == Result
@@ -21,6 +22,7 @@ extension IMAPCommand {
     var description: String { "\(name) command" }
 }
 
+// Command-specific handler; process and deliver result via NIO promise
 protocol IMAPCommandHandler: ChannelInboundHandler, RemovableChannelHandler, Sendable where Result: Sendable {
     associatedtype Result
     init(tag: String, promise: EventLoopPromise<Result>)

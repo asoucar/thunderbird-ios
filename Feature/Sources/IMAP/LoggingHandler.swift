@@ -3,7 +3,7 @@ import OSLog
 
 // Generic NIO channel logger, a pass-through duplex handler
 // Reads the raw bytes going both directions without modifying
-// Logs only when built with DEBUG set
+// Logs only when built with DEBUG
 final class LoggingHandler: ChannelDuplexHandler, @unchecked Sendable {
     let logger: Logger?
 

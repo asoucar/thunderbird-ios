@@ -11,6 +11,11 @@ public class IMAPClient {
     public var capabilities: Set<Capability> = []
     public var isConnected: Bool { channel != nil && channel!.isActive }
 
+    public func isSupported(_ capability: Capability) -> Bool {
+        capabilities.contains(capability)
+    }
+
+    /// Bootstrap NIO channel, connect to the configured ``Server``.
     public func connect() async throws {
         logger?.info("Connecting to \(self.server)…")
         resetInactiveChannel()
@@ -32,14 +37,27 @@ public class IMAPClient {
         }
     }
 
-    public func login() async throws {
-        try await login(username: server.username, password: server.password)
+    /// Disconnect NIO channel from configured ``Server``; reset to ready for new connection.
+    public func disconnect() throws {
+        guard let channel else {
+            logger?.error("\(IMAPError.notConnected)")
+            throw IMAPError.notConnected
+        }
+        channel.close(promise: nil)
+        self.channel = nil
     }
 
+    /// Log in to connected IMAP server using configured ``Server`` credentials.
+    public func login() async throws {
+        try await login(username: server.username ?? "", password: server.password ?? "")
+    }
+
+    /// Log in to connected IMAP ``Server`` using locally specified credentials.
     public func login(username: String, password: String) async throws {
         logger?.info("Logging in \(username)…")
         let capabilities: [Capability] = try await execute(command: LoginCommand(username: username, password: password))
         if !capabilities.isEmpty {
+            // IMAP servers can return _additional_ capabilities after login
             logger?.info("Mergina capabilities…")
             for capability in capabilities {
                 self.capabilities.insert(capability)
@@ -48,18 +66,10 @@ public class IMAPClient {
         }
     }
 
+    /// Log out from connected IMAP ``Server``; leave active NIO channel connection intact.
     public func logout() async throws {
         logger?.info("Logging out…")
         try await execute(command: LogoutCommand())
-    }
-
-    public func disconnect() throws {
-        guard let channel else {
-            logger?.error("\(IMAPError.notConnected)")
-            throw IMAPError.notConnected
-        }
-        channel.close(promise: nil)
-        self.channel = nil
     }
 
     public init(
@@ -71,15 +81,21 @@ public class IMAPClient {
         self.logger = logger
     }
 
+    // Generate IMAP command tag in traditional format "a001"
     static func tag(_ count: Int, prefix: Character = .prefix) -> String {
+        // IMAP uses client-provided unique identifiers, "tags," for matching issued commands to responses
+        // Tags can be any ASCII string without spaces
+        // Traditionally, tags are prefixed "a," followed by a 3-digit, auto-incremented number: 001...999
         "\(prefix)\(String(format: "%03d", min(max(count, 1), 999)))"
     }
 
+    // Generate next, auto-incrementing IMAP tag using instance counter
     func tag(prefix: Character = .prefix) -> String {
         count = count > 998 ? 1 : count + 1  // Auto-increment tag count; roll back to 1 after 999
         return Self.tag(count, prefix: prefix)
     }
 
+    // Run IMAP command through NIO `IMAPClientHandler` in channel and handle results
     func execute<T: IMAPCommand>(command: T) async throws -> T.Result {
         let logger: Logger? = logger
         logger?.debug("Executing \(command)…")
