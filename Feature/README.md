@@ -50,7 +50,7 @@ import Autoconfiguration
 let records: [SRVRecord] = try await DNSResolver.querySRV("example@thundermail.com")
 ```
 
-[Autodiscover for Exchange](https://learn.microsoft.com/en-us/exchange/client-developer/exchange-web-services/autodiscover-for-exchange) is not supported at this time. Local and [MDM](https://support.apple.com/guide/deployment/welcome/web) configurations are not supported yet. 
+[Autodiscover for Exchange](https://learn.microsoft.com/en-us/exchange/client-developer/exchange-web-services/autodiscover-for-exchange) is not supported at this time. Local and [MDM](https://support.apple.com/guide/deployment/welcome/web) configurations are not supported yet.
 
 `Autoconfiguration` library depends on the [Swift Asynchronous DNS Resolver.](https://github.com/apple/swift-async-dns-resolver)
 
@@ -96,7 +96,20 @@ Both protocols use [TCP](https://wikipedia.org/wiki/Transmission_Control_Protoco
 
 ### `IMAP` Library
 
+`IMAP` implementation glues NIOIMAP models and networking into an async/await interface.
 
+```swift
+import IMAP
+
+let client = IMAPClient(Server(
+    hostname: "imap.mail.example.com"
+))
+try await client.login(username: "user@example.com", password: "fake-appp-pass-word")
+print(client.capabilities)  // "SASL-IR", "IMAP4rev1", "AUTH=XOAUTH2"…
+try await client.logout()
+```
+
+`IMAP` library depends on [Swift NIOIMAP.](https://github.com/apple/swift-nio-imap)
 
 ### `SMTP` Library
 
@@ -123,6 +136,8 @@ try await SMTPClient(Server(
     ]
 ))
 ```
+
+`SMTP` library depends on [SwiftNIO](https://github.com/apple/swift-nio) for transport.
 
 ## `JMAP`
 
@@ -175,12 +190,12 @@ guard let string: String = String(data: body.rawValue, encoding: .ascii) else {
 print(string)
 // MIME-Version: 1.0
 // Content-Type: multipart/alternative; boundary="_----------=_176171960423967"
-// 
+//
 // --_----------=_176171960423967
 // Content-Disposition: inline
 // Content-Transfer-Encoding: quoted-printable
 // Content-Type: text/plain; charset="UTF-8"
-// 
+//
 // Hello,
 // ...
 ```
