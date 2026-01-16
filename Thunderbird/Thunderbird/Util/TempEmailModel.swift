@@ -26,7 +26,7 @@ class TempEmail {
 
     init(
         sender: String,
-        recipients:[String],
+        recipients: [String],
         headerText: String,
         bodyText: String,
         dateSent: Date,

@@ -28,17 +28,16 @@ struct ReadEmailView: View {
     private var sentDate: Date
     private var attachments: [Data]!
 
-
     var body: some View {
         NavigationView {
             VStack(alignment: .leading, spacing: 20) {
                 Text(subject)
                     .font(.title3)
-                ScrollView{
-                    VStack(alignment: .leading){
+                ScrollView {
+                    VStack(alignment: .leading) {
                         SenderView(sender, sentDate, recipients)
                         WebView(htmlString: emailBody).scaledToFill()
-                        if(attachments != nil){
+                        if attachments != nil {
                             AttachmentBlockView(attachments)
                         }
                     }
@@ -120,10 +119,10 @@ struct AttachmentBlockView: View {
     }
     private var attachments: [Data]
     var body: some View {
-        VStack(alignment:.leading){
+        VStack(alignment: .leading) {
             Text("^[\(attachments.count) attachment](inflect: true)")
                 .font(.footnote)
-            ForEach(attachments, id: \.self){_ in
+            ForEach(attachments, id: \.self) { _ in
                 SingleAttachment()
             }
         }
@@ -136,12 +135,12 @@ struct SingleAttachment: View {
         //Do Stuff
     }
     var body: some View {
-        HStack(){
+        HStack {
             Image(systemName: "photo")
                 .resizable()
                 .frame(width: 56, height: 44)
                 .foregroundStyle(.gray)
-            VStack(alignment: .leading){
+            VStack(alignment: .leading) {
                 Text("rockFlying.png")
                 Text("1.78 MB")
             }.font(.footnote)
@@ -168,7 +167,7 @@ struct SenderView: View {
         self.recipients = recipients
     }
     private var sender: String
-    private var recipients:[String]
+    private var recipients: [String]
     private var date: Date
     @State private var showingAlert = false
     @State private var unimplementedFeatureName: String = ""
@@ -176,12 +175,12 @@ struct SenderView: View {
     var body: some View {
         HStack {
             VStack(alignment: .leading) {
-                HStack() {
+                HStack {
                     Text(sender).font(.title3)
                 }
-                HStack{
+                HStack {
                     Text("To: \(recipients[0])")
-                    if(recipients.count > 1) {
+                    if recipients.count > 1 {
                         Text("+\(recipients.count-1)")
                     }
                 }
