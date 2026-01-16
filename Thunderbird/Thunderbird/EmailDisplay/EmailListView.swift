@@ -99,11 +99,12 @@ struct EmailListView: View {
                 Button {
                     // Action
                 } label: {
-                    Image(systemName: "pencil.circle")
+                    Image("compose")
                         .font(.title.weight(.regular))
-                        .padding()
+                        .padding(.all, 12)
+                        .padding(.leading, 5)
                         .background(Color(white: 0.9))
-                        .foregroundColor(.gray)
+                        .foregroundColor(.muted)
                         .clipShape(Circle())
                 }
                 .background(.clear)
@@ -114,7 +115,7 @@ struct EmailListView: View {
     }
 }
 
-#Preview("Email Cell") {
+#Preview("Email List") {
     @Previewable @State var accounts: Accounts = Accounts()
     EmailListView().environment(accounts)
 
