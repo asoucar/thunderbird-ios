@@ -72,6 +72,12 @@ public class IMAPClient {
         try await execute(command: LogoutCommand())
     }
 
+    /// List all mailboxes on logged-in IMAP ``Server``.
+    public func list(wildcard: Character = .wildcard) async throws -> [Mailbox] {
+        logger?.info("Listing mailboxes…")
+        return try await execute(command: ListCommand(wildcard: wildcard))
+    }
+
     public init(
         _ server: Server,
         logger: Logger? = Logger(subsystem: "net.thunderbird", category: "IMAP")
@@ -155,6 +161,7 @@ public class IMAPClient {
 }
 
 extension Character {
+    public static let wildcard: Self = "*"
     static let prefix: Self = "a"
 }
 

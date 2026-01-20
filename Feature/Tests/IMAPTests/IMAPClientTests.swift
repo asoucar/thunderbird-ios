@@ -12,6 +12,17 @@ struct IMAPClientTests {
         try? client.disconnect()
     }
 
+    @Test(.disabled(if: Server.server.isDisabled)) func disconnect() async throws {
+        let client: IMAPClient = IMAPClient(.server)
+        #expect(throws: IMAPError.notConnected) {
+            try client.disconnect()
+        }
+        try await client.connect()
+        #expect(client.isConnected == true)
+        try client.disconnect()
+        #expect(client.isConnected == false)
+    }
+
     @Test(.disabled(if: Server.server.isDisabled)) func login() async throws {
         let client: IMAPClient = IMAPClient(.server)
         try await client.connect()
@@ -30,15 +41,15 @@ struct IMAPClientTests {
         try? client.disconnect()
     }
 
-    @Test(.disabled(if: Server.server.isDisabled)) func disconnect() async throws {
+    @Test(.disabled(if: Server.server.isDisabled)) func list() async throws {
         let client: IMAPClient = IMAPClient(.server)
-        #expect(throws: IMAPError.notConnected) {
-            try client.disconnect()
-        }
         try await client.connect()
         #expect(client.isConnected == true)
-        try client.disconnect()
-        #expect(client.isConnected == false)
+        try await client.login()
+        let mailboxes: [Mailbox] = try await client.list()
+        #expect(mailboxes.count > 1)
+        try await client.logout()
+        try? client.disconnect()
     }
 
     @Test func tag() {
