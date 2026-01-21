@@ -33,6 +33,7 @@ concurrency:
 
 jobs:
   build_and_deploy_ios:
+    if: github.repository == 'thunderbird/thunderbird-ios'
     runs-on: macos-26
     environment: thunderbird_release
 
