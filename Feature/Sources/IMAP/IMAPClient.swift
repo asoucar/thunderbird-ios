@@ -9,6 +9,7 @@ public class IMAPClient {
     public let server: Server
 
     public var capabilities: Set<Capability> = []
+    public var namespaces: Set<Namespace> = []
     public var isConnected: Bool { channel != nil && channel!.isActive }
 
     public func isSupported(_ capability: Capability) -> Bool {
@@ -57,7 +58,7 @@ public class IMAPClient {
         logger?.info("Logging in \(username)…")
         let capabilities: [Capability] = try await execute(command: LoginCommand(username: username, password: password))
         if !capabilities.isEmpty {
-            // IMAP servers can return _additional_ capabilities after login
+            // IMAP servers can return additional capabilities after login
             logger?.info("Merging capabilities…")
             for capability in capabilities {
                 self.capabilities.insert(capability)
@@ -69,14 +70,47 @@ public class IMAPClient {
     /// Log out from connected IMAP ``Server``; leave active NIO channel connection intact.
     public func logout() async throws {
         logger?.info("Logging out…")
-        try await execute(command: LogoutCommand())
+        try await execute(command: VoidCommand(.logout))
     }
+
+    // MARK: Mailbox
 
     /// List all mailboxes on logged-in IMAP ``Server``.
     public func list(wildcard: Character = .wildcard) async throws -> [Mailbox] {
         logger?.info("Listing mailboxes…")
         return try await execute(command: ListCommand(wildcard: wildcard))
     }
+
+    /// Select a current working mailbox.
+    public func select(mailbox: Mailbox) async throws -> Mailbox.Status {
+        logger?.info("Selecting mailbox \(mailbox.path.name)…")
+        return try await execute(command: SelectCommand(mailbox.path.name))
+    }
+
+    public func status(mailbox: Mailbox) async throws -> Mailbox.Status {
+        logger?.info("Refreshing mailbox \(mailbox.path.name) status…")
+        return try await execute(command: StatusCommand(mailbox.path.name))
+    }
+
+    /// Expunge messages flagged as deleted in current working mailbox.
+    public func expunge() async throws {
+        logger?.info("Expunging selected mailbox…")
+        try await execute(command: VoidCommand(.expunge))
+    }
+
+    /// Unselect current working mailbox; don't expunge messages flagged as deleted.
+    public func unselect() async throws {
+        logger?.info("Unselecting mailbox…")
+        try await execute(command: VoidCommand(.unselect))
+    }
+
+    /// Expunge and unselect current working mailbox.
+    public func close() async throws {
+        logger?.info("Closing selected mailbox…")
+        try await execute(command: VoidCommand(.close))
+    }
+
+    // MARK: Message
 
     public init(
         _ server: Server,
@@ -142,6 +176,12 @@ public class IMAPClient {
         }
     }
 
+    func refreshNamespaces() async throws {
+        logger?.info("Refreshing namespaces…")
+        namespaces = Set(try await execute(command: NamespaceCommand()))
+        logger?.info("Namespaces: \(self.namespaces)")
+    }
+
     func refreshCapabilities() async throws {
         logger?.info("Refreshing capabilities…")
         capabilities = Set(try await execute(command: CapabilityCommand()))
@@ -161,7 +201,9 @@ public class IMAPClient {
 }
 
 extension Character {
+    public static let delimiter: Self = "."
     public static let wildcard: Self = "*"
+
     static let prefix: Self = "a"
 }
 

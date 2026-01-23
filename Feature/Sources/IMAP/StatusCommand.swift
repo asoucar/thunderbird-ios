@@ -1,35 +1,34 @@
 import NIOCore
 import NIOIMAP
 
-// List all mailboxes available for authenticated user
-struct ListCommand: IMAPCommand {
-    let options: [ReturnOption]
-    let wildcard: Character
+struct StatusCommand: IMAPCommand {
+    let mailboxName: MailboxName
+    let attributes: [MailboxAttribute]
 
-    init(options: [ReturnOption] = [], wildcard: Character) {
-        self.options = options
-        self.wildcard = wildcard
+    init(_ mailboxName: MailboxName, attributes: [MailboxAttribute] = MailboxAttribute.allCases) {
+        self.mailboxName = mailboxName
+        self.attributes = attributes
     }
 
     // MARK: IMAPCommand
-    typealias Result = [MailboxInfo]
-    typealias Handler = ListHandler
+    typealias Result = MailboxStatus
+    typealias Handler = StatusHandler
 
-    var name: String { "list" }
+    var name: String { "status" }
 
     func tagged(_ tag: String) -> NIOIMAPCore.TaggedCommand {
-        TaggedCommand(tag: tag, command: .list(nil, reference: .reference, .mailbox(wildcard), options))
+        TaggedCommand(tag: tag, command: .status(mailboxName, attributes))
     }
 }
 
-class ListHandler: IMAPCommandHandler, @unchecked Sendable {
+class StatusHandler: IMAPCommandHandler, @unchecked Sendable {
 
     // MARK: IMAPCommandHandler
     typealias InboundIn = Response
     typealias InboundOut = Response
-    typealias Result = [MailboxInfo]
+    typealias Result = MailboxStatus
 
-    var mailboxes: Result = []
+    var status: MailboxStatus = MailboxStatus()
     var clientBug: String? = nil
     let promise: EventLoopPromise<Result>
     let tag: String
@@ -48,12 +47,12 @@ class ListHandler: IMAPCommandHandler, @unchecked Sendable {
             case .bad(let text), .no(let text):
                 promise.fail(IMAPError.commandFailed(text.text))
             case .ok:
-                promise.succeed(mailboxes)
+                promise.succeed(status)
             }
         case .untagged(let payload):
             switch payload {
-            case .mailboxData(.list(let mailbox)):
-                mailboxes.append(mailbox)
+            case .mailboxData(.status(_, let status)):
+                self.status = status
             default:
                 break
             }
@@ -61,15 +60,5 @@ class ListHandler: IMAPCommandHandler, @unchecked Sendable {
             break
         }
         context.fireChannelRead(data)
-    }
-}
-
-extension MailboxName {
-    static var reference: Self { Self(ByteBuffer(string: "")) }
-}
-
-extension MailboxPatterns {
-    static func mailbox(_ wildcard: Character = .wildcard) -> Self {
-        .mailbox(ByteBuffer(string: "\(wildcard)"))
     }
 }

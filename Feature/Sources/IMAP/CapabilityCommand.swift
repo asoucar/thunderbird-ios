@@ -2,13 +2,14 @@ import NIOCore
 import NIOIMAP
 
 // Fetch advertised server capabilities
+// https://www.iana.org/assignments/imap-capabilities/imap-capabilities.xhtml
 struct CapabilityCommand: IMAPCommand {
 
     // MARK: IMAPCommand
     typealias Result = [Capability]
     typealias Handler = CapabilityHandler
 
-    static var name: String { "capability" }
+    var name: String { "capability" }
 
     func tagged(_ tag: String) -> NIOIMAPCore.TaggedCommand {
         TaggedCommand(tag: tag, command: .capability)
