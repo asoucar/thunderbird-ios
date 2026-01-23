@@ -26,7 +26,7 @@ struct EmailCellView: View {
         self.dateSent = email.dateSent
         self.unread = email.unread
         self.newEmail = email.newEmail
-        self.hasAttachment = email.hasAttachment
+        self.hasAttachment = email.attachments != nil
         self.isThread = email.isThread
     }
 
@@ -61,29 +61,34 @@ struct EmailCellView: View {
                 HStack {
                     Text(senderText)
                         .lineLimit(1)
-                        .font(.title3)
+                        .font(.headline)
                         .fontWeight(unread ? .semibold : .regular)
                     Spacer()
                     Text(dateFormatter(date: dateSent))
                         .lineLimit(1)
-                        .font(.subheadline)
+                        .font(.footnote)
                         .truncationMode(.tail)
+                        .foregroundColor(.muted)
                 }
                 HStack {
                     Text(headerText)
                         .lineLimit(1)
-                        .font(.title3)
+                        .font(.subheadline)
                         .fontWeight(unread ? .semibold : .regular)
                     Spacer()
                     if hasAttachment {
                         Image(systemName: "paperclip")
+                            .foregroundColor(.muted)
                     }
                     if isThread {
                         Text("99+")
+                            .font(.caption2)
                             .padding(.horizontal, 5)
+                            .foregroundColor(.muted)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 18)
                                     .stroke(lineWidth: 1)
+                                    .foregroundColor(.muted)
                             )
 
                     }
@@ -92,7 +97,8 @@ struct EmailCellView: View {
 
                 Text(bodyText)
                     .lineLimit(1)
-                    .foregroundStyle(.gray)
+                    .foregroundColor(.muted)
+                    .font(.footnote)
             }
         }
 
@@ -102,12 +108,13 @@ struct EmailCellView: View {
 #Preview("Email Cell") {
     let tempEmail = TempEmail(
         sender: "Sender5",
+        recipients: ["Rhea"],
         headerText: "Email four with a longer set of text",
         bodyText: "This is some nice long text",
         dateSent: Date(),
         unread: true,
         newEmail: false,
-        hasAttachment: false,
+        attachments: nil,
         isThread: true
     )
     EmailCellView(email: tempEmail)
