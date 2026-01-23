@@ -41,13 +41,18 @@ public struct SMTPClient {
                 group: group,
                 done: done
             )
+            let logger: Logger? = logger
+            logger?.info("Connecting to \(server)…")
             let connection: EventLoopFuture<any Channel> = bootstrap.connect(host: server.hostname, port: server.port)
             connection.cascadeFailure(to: done)
+            logger?.info("Sending…")
             try await withCheckedThrowingContinuation { continuation in
                 done.futureResult.map {
+                    logger?.info("Sent")
                     connection.whenSuccess { $0.close(promise: nil) }
                     continuation.resume()
                 }.whenFailure { error in
+                    logger?.error("Send failed: \(error.localizedDescription)")
                     connection.whenSuccess { $0.close(promise: nil) }
                     continuation.resume(throwing: error)
                 }

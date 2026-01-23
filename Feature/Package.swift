@@ -93,6 +93,7 @@ let package: Package = Package(
             name: "IMAP",
             dependencies: [
                 .product(name: "NIOIMAP", package: "swift-nio-imap"),
+                .product(name: "NIOSSL", package: "swift-nio-ssl"),
                 "EmailAddress",
                 "MIME"
             ]),

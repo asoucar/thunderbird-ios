@@ -17,6 +17,19 @@ extension String {
         return Self(data: data, encoding: .ascii)
     }
 
+    /// Capitalization case formats
+    public enum Case: CaseIterable {
+        case sentence, title
+    }
+
+    /// Overload capitalization with alternate case options
+    public func capitalized(_ `case`: Case) -> Self {
+        switch `case` {
+        case .sentence: "\(prefix(1).capitalized)\(dropFirst())"
+        case .title: capitalized
+        }
+    }
+
     /// Break email header value string into parameter keys and values.
     public var parameters: [Self: Self] {
         var parameters: [Self: Self] = [:]

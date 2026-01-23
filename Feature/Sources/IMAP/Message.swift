@@ -17,14 +17,6 @@ public struct Message {
     public let size: Int
     public let subject: String
     public let uid: UID
-
-    public var isAnswered: Bool { flags.isAnswered }
-    public var isDeleted: Bool { flags.isDeleted }
-    public var isDraft: Bool { flags.isDraft }
-    public var isEmpty: Bool { body.isEmpty }
-    public var isFlagged: Bool { flags.isFlagged }
-    public var isForwarded: Bool { flags.isForwarded }
-    public var isSeen: Bool { flags.isSeen }
 }
 
 extension Message.Flag: @retroactive CustomStringConvertible {
@@ -35,7 +27,7 @@ extension Message.Flag: @retroactive CustomStringConvertible {
 
 public typealias UID = NIOIMAP.UID
 
-private extension [Message.Flag] {
+public extension [Message.Flag] {
     var isAnswered: Bool { contains(.answered) }
     var isDeleted: Bool { contains(.deleted) }
     var isDraft: Bool { contains(.draft) }

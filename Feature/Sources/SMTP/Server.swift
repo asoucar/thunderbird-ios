@@ -1,5 +1,5 @@
 /// ``SMTPClient`` connects to `Server`.
-public struct Server: Equatable, Sendable {
+public struct Server: CustomStringConvertible, Equatable, Sendable {
     public let connectionSecurity: ConnectionSecurity
     public let hostname: String
     public let username: String
@@ -19,4 +19,7 @@ public struct Server: Equatable, Sendable {
         self.password = password
         self.port = port
     }
+
+    // MARK: CustomStringConvertible
+    public var description: String { "\(hostname):\(port)" }
 }

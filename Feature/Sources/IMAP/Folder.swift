@@ -1,8 +1,12 @@
 public struct Folder: Identifiable {
+    public enum Status {
+
+    }
+
     public let name: String
     public let unreadCount: Int
     public let visibleLimit: Int
-    // public let status: Status
+    public let status: Status
     public let flaggedCount: Int
     public let integrate: Int
     public let topGroup: Int

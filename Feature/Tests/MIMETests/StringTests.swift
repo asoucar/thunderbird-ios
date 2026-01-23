@@ -17,6 +17,13 @@ struct StringTests {
         #expect("".ascii == "")
     }
 
+    @Test func capitalized() {
+        #expect("when i was little".capitalized(.sentence) == "When i was little")
+        #expect("when I was little".capitalized(.sentence) == "When I was little")
+        #expect("when i was little".capitalized(.title) == "When I Was Little")
+        #expect("when i was little".capitalized == "When I Was Little")
+    }
+
     @Test func parameters() {
         #expect(
             "multipart/alternative; boundary=\"_----------=_17617196041979919223967\"".parameters == [
