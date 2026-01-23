@@ -1,22 +1,30 @@
 name: Shippable Builds
 
+env:
+  DEFAULT_VERSION: &default_version "1.0"
+  DEFAULT_NOTIFY_TESTERS: &default_notify_testers false
+  DEFAULT_TEST_DEVICE: &default_test_device "iPhone 17"
+
 on:
+  schedule:
+    # Weekly run on Friday at 14:00 UTC
+    - cron: '0 14 * * 5'
   workflow_dispatch:
     inputs:
       version:
         description: 'Version to build (optional)'
         required: false
-        default: "1.0"
+        default: *default_version
         type: string
       notify_testers:
         description: 'Notify external testers'
         required: false
-        default: false
+        default: *default_notify_testers
         type: boolean
       test_device:
         description: 'iOS Simulator device for tests (optional)'
         required: false
-        default: "iPhone 17"
+        default: *default_test_device
         type: string
 
 concurrency:
@@ -25,6 +33,7 @@ concurrency:
 
 jobs:
   build_and_deploy_ios:
+    if: github.repository == 'thunderbird/thunderbird-ios'
     runs-on: macos-26
     environment: thunderbird_release
 
@@ -38,7 +47,7 @@ jobs:
           xcode-select-version: '26.0'
 
       - name: Setup Ruby and Fastlane
-        uses: ruby/setup-ruby@675dd7ba1b06c8786a1480d89c384f5620a42647 # v1.281.0
+        uses: ruby/setup-ruby@80740b3b13bf9857e28854481ca95a84e78a2bdf # v1.284.0
         with:
           ruby-version: '3.0'
           bundler-cache: true
@@ -150,9 +159,9 @@ jobs:
           APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          VERSION_INPUT: ${{ inputs.version }}
-          NOTIFY_TESTERS: ${{ inputs.notify_testers }}
-          TEST_DEVICE: ${{ inputs.test_device }}
+          VERSION_INPUT: ${{ inputs.version || env.DEFAULT_VERSION }}
+          NOTIFY_TESTERS: ${{ inputs.notify_testers || env.DEFAULT_NOTIFY_TESTERS }}
+          TEST_DEVICE: ${{ inputs.test_device || env.DEFAULT_TEST_DEVICE }}
           APP_STORE_CONNECT_API_KEY_PATH: ${{ env.APP_STORE_CONNECT_API_KEY_PATH }}
         run: |
           bundle exec fastlane beta
