@@ -12,7 +12,7 @@ struct ExamineCommand: IMAPCommand {
     typealias Result = MailboxStatus
     typealias Handler = ExamineHandler
 
-    var name: String { "examine" }
+    var name: String { "examine \"\(mailboxName)\"" }
 
     func tagged(_ tag: String) -> NIOIMAPCore.TaggedCommand {
         TaggedCommand(tag: tag, command: .examine(mailboxName))

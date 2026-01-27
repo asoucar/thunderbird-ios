@@ -13,7 +13,7 @@ struct SelectCommand: IMAPCommand {
     typealias Result = MailboxStatus
     typealias Handler = SelectHandler
 
-    var name: String { "select" }
+    var name: String { "select \"\(mailboxName)\"" }
 
     func tagged(_ tag: String) -> NIOIMAPCore.TaggedCommand {
         TaggedCommand(tag: tag, command: .select(mailboxName))

@@ -10,7 +10,7 @@ struct LoginCommand: IMAPCommand {
     typealias Result = [Capability]
     typealias Handler = CapabilityHandler
 
-    var name: String { "login" }
+    var name: String { "login \"\(username)\"" }
 
     func tagged(_ tag: String) -> NIOIMAPCore.TaggedCommand {
         TaggedCommand(tag: tag, command: .login(username: username, password: password))

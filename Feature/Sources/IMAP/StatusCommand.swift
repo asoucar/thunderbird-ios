@@ -1,11 +1,12 @@
 import NIOCore
 import NIOIMAP
 
+// Fetch status (message counts) for given mailbox
 struct StatusCommand: IMAPCommand {
     let mailboxName: MailboxName
     let attributes: [MailboxAttribute]
 
-    init(_ mailboxName: MailboxName, attributes: [MailboxAttribute] = MailboxAttribute.allCases) {
+    init(_ mailboxName: MailboxName, attributes: [MailboxAttribute] = .standard) {
         self.mailboxName = mailboxName
         self.attributes = attributes
     }
@@ -14,7 +15,7 @@ struct StatusCommand: IMAPCommand {
     typealias Result = MailboxStatus
     typealias Handler = StatusHandler
 
-    var name: String { "status" }
+    var name: String { "status \"\(mailboxName)\"" }
 
     func tagged(_ tag: String) -> NIOIMAPCore.TaggedCommand {
         TaggedCommand(tag: tag, command: .status(mailboxName, attributes))
@@ -60,5 +61,15 @@ class StatusHandler: IMAPCommandHandler, @unchecked Sendable {
             break
         }
         context.fireChannelRead(data)
+    }
+}
+
+extension [MailboxAttribute] {
+    static var standard: Self {
+        [
+            .messageCount,
+            .recentCount,
+            .unseenCount
+        ]
     }
 }
