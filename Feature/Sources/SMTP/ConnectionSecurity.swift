@@ -3,6 +3,8 @@ public enum ConnectionSecurity: String, Codable, CaseIterable, CustomStringConve
     case tls = "SSL/TLS"
     case none
 
+    public static var ssl: Self { .tls }
+
     // MARK: CustomStringConvertible
     public var description: String { rawValue }
 
