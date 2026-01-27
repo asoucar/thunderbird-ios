@@ -1,4 +1,5 @@
 import Foundation
+import MIME
 import NIO
 import NIOIMAP
 import NIOSSL
@@ -9,7 +10,6 @@ public class IMAPClient {
     public let server: Server
 
     public var capabilities: Set<Capability> = []
-    public var namespaces: Set<Namespace> = []
     public var isConnected: Bool { channel != nil && channel!.isActive }
 
     public func isSupported(_ capability: Capability) -> Bool {
@@ -73,7 +73,13 @@ public class IMAPClient {
         try await execute(command: VoidCommand(.logout))
     }
 
-    // MARK: Mailbox
+    /// Fetch namespaces available to authenticated user.`
+    public func namespace() async throws -> [Namespace] {
+        logger?.info("Fetching namespace…")
+        let namespace: [Namespace] = try await execute(command: NamespaceCommand())
+        logger?.info("Namespaces: \(namespace)")
+        return namespace
+    }
 
     /// List all mailboxes on logged-in IMAP ``Server``.
     public func list(wildcard: Character = .wildcard) async throws -> [Mailbox] {
@@ -81,12 +87,19 @@ public class IMAPClient {
         return try await execute(command: ListCommand(wildcard: wildcard))
     }
 
-    /// Select a current working mailbox.
+    /// Select current working mailbox in read/write mode.
     public func select(mailbox: Mailbox) async throws -> Mailbox.Status {
         logger?.info("Selecting mailbox \(mailbox.path.name)…")
         return try await execute(command: SelectCommand(mailbox.path.name))
     }
 
+    /// Select a working mailbox in read-only mode.
+    public func examine(mailbox: Mailbox) async throws -> Mailbox.Status {
+        logger?.info("Examining mailbox \(mailbox.path.name)…")
+        return try await execute(command: ExamineCommand(mailbox.path.name))
+    }
+
+    /// Fetch the current status for a mailbox.
     public func status(mailbox: Mailbox) async throws -> Mailbox.Status {
         logger?.info("Refreshing mailbox \(mailbox.path.name) status…")
         return try await execute(command: StatusCommand(mailbox.path.name))
@@ -104,13 +117,41 @@ public class IMAPClient {
         try await execute(command: VoidCommand(.unselect))
     }
 
+    /// Create a new mailbox.
+    public func create(mailbox name: MailboxName) async throws {
+        logger?.info("Creating \"\(name)\" mailbox…")
+        try await execute(command: CreateCommand(name))
+    }
+
+    /// Rename an existing mailbox.
+    public func rename(mailbox name: MailboxName, to targetName: MailboxName) async throws {
+        logger?.info("Renaming \"\(name)\" mailbox to \"\(targetName)\"…")
+        try await execute(command: RenameCommand(name, to: targetName))
+    }
+
+    /// Delete an existing mailbox.
+    public func delete(mailbox name: MailboxName) async throws {
+        logger?.info("Deleting \"\(name)\" mailbox…")
+        try await execute(command: DeleteCommand(name))
+    }
+
+    /// Subscribe to an existing mailbox.
+    public func subscribe(mailbox name: MailboxName) async throws {
+        logger?.info("Subscribing \"\(name)\" mailbox…")
+        try await execute(command: SubscribeCommand(name))
+    }
+
+    /// Unsubscribe from an existing mailbox.
+    public func unsubscribe(mailbox name: MailboxName) async throws {
+        logger?.info("Unsubscribing \"\(name)\" mailbox…")
+        try await execute(command: UnsubscribeCommand(name))
+    }
+
     /// Expunge and unselect current working mailbox.
     public func close() async throws {
         logger?.info("Closing selected mailbox…")
         try await execute(command: VoidCommand(.close))
     }
-
-    // MARK: Message
 
     public init(
         _ server: Server,
@@ -119,20 +160,6 @@ public class IMAPClient {
         group = MultiThreadedEventLoopGroup(numberOfThreads: 1)
         self.server = server
         self.logger = logger
-    }
-
-    // Generate IMAP command tag in traditional format "a001"
-    static func tag(_ count: Int, prefix: Character = .prefix) -> String {
-        // IMAP uses client-provided unique identifiers, "tags," for matching issued commands to responses
-        // Tags can be any ASCII string without spaces
-        // Traditionally, tags are prefixed "a," followed by a 3-digit, auto-incremented number: 001...999
-        "\(prefix)\(String(format: "%03d", min(max(count, 1), 999)))"
-    }
-
-    // Generate next, auto-incrementing IMAP tag using instance counter
-    func tag(prefix: Character = .prefix) -> String {
-        count = count > 998 ? 1 : count + 1  // Auto-increment tag count; roll back to 1 after 999
-        return Self.tag(count, prefix: prefix)
     }
 
     // Run IMAP command through NIO `IMAPClientHandler` in channel and handle results
@@ -147,7 +174,7 @@ public class IMAPClient {
             throw IMAPError.notConnected
         }
         let promise: EventLoopPromise<T.Result> = channel.eventLoop.makePromise(of: T.Result.self)
-        let tag: String = tag()  // Hold onto specific auto-generated tag
+        let tag: String = UUID().uuidString(1)  // Hold onto specific auto-generated tag
         let handler: T.Handler = T.Handler(tag: tag, promise: promise)
         let seconds: Int64 = max(command.timeout, 1)
         let task: Scheduled = group.next().scheduleTask(in: .seconds(seconds)) {
@@ -174,12 +201,6 @@ public class IMAPClient {
             logger?.error("\(error)")
             throw IMAPError.commandFailed(command.description)
         }
-    }
-
-    func refreshNamespaces() async throws {
-        logger?.info("Refreshing namespaces…")
-        namespaces = Set(try await execute(command: NamespaceCommand()))
-        logger?.info("Namespaces: \(self.namespaces)")
     }
 
     func refreshCapabilities() async throws {
