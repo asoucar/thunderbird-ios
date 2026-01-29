@@ -36,15 +36,15 @@ struct EmailListView: View {
     var body: some View {
         NavigationStack {
             ZStack(alignment: .bottomTrailing) {
-                if(tempEmails.isEmpty){
-                    VStack{
+                if tempEmails.isEmpty {
+                    VStack {
                         Text("Your inbox is empty")
                             .padding(.bottom, 5)
                         Text("New messages will appear here as they arrive")
                             .padding(.bottom, 10)
-                        Button{
+                        Button {
 
-                        }label: {
+                        } label: {
                             Text("Add another account")
                         }.buttonBorderShape(.capsule)
                             .buttonStyle(.bordered)
