@@ -17,7 +17,7 @@ public enum IMAPError: Error, CustomStringConvertible, Equatable {
     }
 
     static func commandFailed(_ command: any IMAPCommand) -> Self {
-        .commandFailed(command.description)
+        .commandFailed("\(command) failed")
     }
 
     static func commandNotSupported(_ command: any IMAPCommand) -> Self {
@@ -32,7 +32,7 @@ public enum IMAPError: Error, CustomStringConvertible, Equatable {
     public var description: String {
         switch self {
         case .alreadyConnected: "Already connected"
-        case .commandFailed(let description): "\(description.capitalized(.sentence)) failed"
+        case .commandFailed(let description): "\(description.capitalized(.sentence))"
         case .commandNotSupported(let description): "\(description.capitalized(.sentence)) not supported"
         case .notConnected: "Not connected"
         case .serverDisconnected: "Server disconnected"
