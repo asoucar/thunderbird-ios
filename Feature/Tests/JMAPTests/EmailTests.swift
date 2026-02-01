@@ -32,12 +32,12 @@ struct EmailTests {
         #expect(emails[0].sender == nil)
         #expect(
             emails[0].from == [
-                Email.Address("theasley@thunderbird.net", name: "Todd Heasley")
+                Email.Address("user@example.com", name: "Example User")
             ])
         #expect(emails[0].replyTo == nil)
         #expect(
             emails[0].to == [
-                Email.Address("toddheasley@fastmail.com")
+                Email.Address("recipient@example.com")
             ])
         #expect(emails[0].cc == nil)
         #expect(emails[0].bcc == nil)
@@ -99,12 +99,12 @@ struct EmailTests {
         #expect(emails[1].sender == nil)
         #expect(
             emails[1].from == [
-                Email.Address("toddheasley@fastmail.com", name: "Todd Heasley")
+                Email.Address("recipient@example.com", name: "Example User")
             ])
         #expect(emails[1].replyTo == nil)
         #expect(
             emails[1].to == [
-                Email.Address("theasley@thunderbird.net", name: "Todd Heasley")
+                Email.Address("user@example.com", name: "Example User")
             ])
         #expect(emails[1].cc == nil)
         #expect(emails[1].bcc == nil)
@@ -127,7 +127,7 @@ struct EmailTests {
             ])
         #expect(emails[1].attachments == [])
         #expect(emails[1].hasAttachment == false)
-        #expect(emails[1].preview == "This is a test. On Fri, Jun 27, 2025, at 4:52 PM, Todd Heasley wrote:")
+        #expect(emails[1].preview == "This is a test. On Fri, Jun 27, 2025, at 4:52 PM, Example User wrote:")
     }
 
     @Test func filterConditionObject() {
@@ -219,7 +219,7 @@ private let data: Data = """
         "size": 272443,
         "to": [
             {
-                "email": "toddheasley@fastmail.com",
+                "email": "recipient@example.com",
                 "name": null
             }
         ],
@@ -240,8 +240,8 @@ private let data: Data = """
         "sender": null,
         "from": [
             {
-                "email": "theasley@thunderbird.net",
-                "name": "Todd Heasley"
+                "email": "user@example.com",
+                "name": "Example User"
             }
         ],
         "references": null,
@@ -255,7 +255,7 @@ private let data: Data = """
         "inReplyTo": [
             "104F9518-F8FD-4C84-9491-6A887D865DCC@me.com"
         ],
-        "preview": "This is a test. On Fri, Jun 27, 2025, at 4:52 PM, Todd Heasley wrote:",
+        "preview": "This is a test. On Fri, Jun 27, 2025, at 4:52 PM, Example User wrote:",
         "blobId": "Gd80606e8b5e8b03eba586b5febbdf57b75183d6e",
         "textBody": [
             {
@@ -305,8 +305,8 @@ private let data: Data = """
         "replyTo": null,
         "to": [
             {
-                "name": "Todd Heasley",
-                "email": "theasley@thunderbird.net"
+                "name": "Example User",
+                "email": "user@example.com"
             }
         ],
         "attachments": [
@@ -315,8 +315,8 @@ private let data: Data = """
         "sender": null,
         "from": [
             {
-                "name": "Todd Heasley",
-                "email": "toddheasley@fastmail.com"
+                "name": "Example User",
+                "email": "recipient@example.com"
             }
         ],
         "receivedAt": "2025-06-28T15:13:45Z",

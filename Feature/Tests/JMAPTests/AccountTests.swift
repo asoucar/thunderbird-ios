@@ -3,9 +3,11 @@ import Foundation
 import Testing
 
 struct AccountTests {
+
+    // MARK: Decodable
     @Test func decoderInit() throws {
         let account: Account = try JSONDecoder().decode(Account.self, from: data)
-        #expect(account.name == "toddheasley@fastmail.com")
+        #expect(account.name == "user@example.com")
         #expect(account.capabilities.count == 3)
         #expect(account.capabilities[.mail]?.maxSizeMailboxName == 490)
         #expect(account.capabilities[.mail]?.mayCreateTopLevelMailbox == true)
@@ -45,9 +47,9 @@ private let data: Data = """
             "maxMailboxDepth": null,
             "maxMailboxesPerEmail": 1000
         },
-        "https://www.fastmail.com/dev/maskedemail": {}
+        "https://www.example.com/dev/maskedemail": {}
     },
-    "name": "toddheasley@fastmail.com",
+    "name": "user@example.com",
     "isReadOnly": false,
     "isPersonal": true
 }

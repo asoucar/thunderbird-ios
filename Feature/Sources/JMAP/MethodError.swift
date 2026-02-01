@@ -9,7 +9,19 @@ public enum MethodError: String, CaseIterable, CustomStringConvertible, Decodabl
     case unknownMethod
 
     // MARK: CustomStringConvertible
-    public var description: String { rawValue }
+    public var description: String {
+        switch self {
+        case .accountNotFound: "Account not found"
+        case .accountNotSupportedByMethod: "Account not supported by method"
+        case .accountReadOnly: "Account read only"
+        case .forbidden: "Forbidden"
+        case .invalidArguments: "Invalid arguments"
+        case .invalidResultReference: "Invalid result reference"
+        case .serverFail, .serverPartialFail: "Server fail"
+        case .serverUnavailable: "Sever unavailable"
+        case .unknownMethod: "Unknown method"
+        }
+    }
 
     // MARK: Decodable
     public init(from decoder: any Decoder) throws {

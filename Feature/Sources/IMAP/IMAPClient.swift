@@ -8,7 +8,7 @@ import OSLog
 public class IMAPClient {
     public let server: Server
 
-    public var capabilities: Set<Capability> = []
+    public private(set) var capabilities: Set<Capability> = []
     public var isConnected: Bool { channel != nil && channel!.isActive }
 
     public func isSupported(_ capability: Capability) -> Bool {

@@ -11,11 +11,11 @@ struct JSONDecoderTests {
         #expect(dates[2].timeIntervalSince1970 == 1751123625.0)
     }
 }
-
+// swift-format-ignore
 private let data: Data = """
-    [
-        "2025-06-27T16:52:45-04:00",
-        "2025-06-28T11:13:45-04:00",
-        "2025-06-28T15:13:45Z"
-    ]
-    """.data(using: .utf8)!
+[
+    "2025-06-27T16:52:45-04:00",
+    "2025-06-28T11:13:45-04:00",
+    "2025-06-28T15:13:45Z"
+]
+""".data(using: .utf8)!

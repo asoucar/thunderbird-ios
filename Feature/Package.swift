@@ -105,7 +105,8 @@ let package: Package = Package(
         .target(
             name: "JMAP",
             dependencies: [
-                "EmailAddress"
+                "EmailAddress",
+                "MIME"
             ]),
         .testTarget(
             name: "JMAPTests",
