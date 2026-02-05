@@ -38,14 +38,14 @@ struct EmailListView: View {
             ZStack(alignment: .bottomTrailing) {
                 if tempEmails.isEmpty {
                     VStack {
-                        Text("Your inbox is empty")
+                        Text("empty_inbox")
                             .padding(.bottom, 5)
-                        Text("New messages will appear here as they arrive")
+                        Text("new_messages_will_appear")
                             .padding(.bottom, 10)
                         Button {
 
                         } label: {
-                            Text("Add another account")
+                            Text("add_another_account")
                         }.buttonBorderShape(.capsule)
                             .buttonStyle(.bordered)
                             .foregroundStyle(.black)
@@ -83,27 +83,27 @@ struct EmailListView: View {
                 .background(.clear)
                 .padding()
             }
-            .navigationTitle("Inbox")
+            .navigationTitle("inbox_header")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
                         Button(
-                            "Date",
+                            "date_sort_button",
                             action: {
                                 sortEmails()
                             })
                         Button(
-                            "Read/unread",
+                            "read_status_sort_button",
                             action: {
                                 sortEmails()
                             })
                         Button(
-                            "Attachments",
+                            "has_attachments_sort_button",
                             action: {
                                 sortEmails()
                             })
                     } label: {
-                        Label("Sort", systemImage: "line.3.horizontal.decrease", )
+                        Label("sort_button", systemImage: "line.3.horizontal.decrease", )
                     }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
@@ -120,11 +120,11 @@ struct EmailListView: View {
                                 openURL(url)
                             })
                     } label: {
-                        Label("Options", systemImage: "ellipsis", )
+                        Label("options_button", systemImage: "ellipsis")
                     }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    NavigationLink("Settings", destination: FeatureFlagDebugView())
+                    NavigationLink("settings_button", destination: FeatureFlagDebugView())
                 }
             }
         }

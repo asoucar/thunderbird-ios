@@ -11,7 +11,7 @@ struct FeatureFlagDebugView: View {
     @State private var allowRemoteFlags = false
     var body: some View {
         VStack {
-            Toggle("Allow remote feature flags", isOn: $allowRemoteFlags).padding()
+            Toggle("all_remote_feature_flags", isOn: $allowRemoteFlags).padding()
             List(flags.featureList, id: \.self) { string in
                 SettingRowView(string, flags.flagForKey(key: .featureX))
             }
