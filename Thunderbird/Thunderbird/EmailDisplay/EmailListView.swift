@@ -52,27 +52,27 @@ struct EmailListView: View {
                             tempEmail
                         )
                     }
-                    .navigationTitle("Inbox")
+                    .navigationTitle("inbox_header")
                     .toolbar {
                         ToolbarItem(placement: .topBarTrailing) {
                             Menu {
                                 Button(
-                                    "Date",
+                                    "date_sort_button",
                                     action: {
                                         sortEmails()
                                     })
                                 Button(
-                                    "Read/unread",
+                                    "read_status_sort_button",
                                     action: {
                                         sortEmails()
                                     })
                                 Button(
-                                    "Attachments",
+                                    "has_attachments_sort_button",
                                     action: {
                                         sortEmails()
                                     })
                             } label: {
-                                Label("Sort", systemImage: "line.3.horizontal.decrease", )
+                                Label("sort_button", systemImage: "line.3.horizontal.decrease", )
                             }
                         }
                         ToolbarItem(placement: .topBarTrailing) {
@@ -93,7 +93,7 @@ struct EmailListView: View {
                             }
                         }
                         ToolbarItem(placement: .topBarTrailing) {
-                            NavigationLink("Settings", destination: FeatureFlagDebugView())
+                            NavigationLink("settings_button", destination: FeatureFlagDebugView())
                         }
                     }.scrollContentBackground(.hidden)
                 Button {

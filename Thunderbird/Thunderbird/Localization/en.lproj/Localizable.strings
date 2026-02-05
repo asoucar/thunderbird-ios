@@ -1,8 +1,12 @@
 "app_name" = "Thunderbird";
+
+//Onboarding
 "onboarding_welcome_text" = "An open source, privacy-focused and ad-free email app for iOS.";
 "onboarding_welcome_text_early" = "This app is in development. Thank you for your interest and feedback as we build.";
 "onboarding_welcome_developed_by" = "Developed by a dedicated team at MZLA Technologies and a global community of volunteers. Part of the Mozilla family.";
 "onboarding_welcome_start_button" = "Get started";
+
+//Account setup
 "account_oauth_sign_in_button" = "Sign in";
 "account_sign_out_button" = "Sign out";
 "account_oauth_sign_in_with_google_button" = "Sign in with Google";
@@ -13,6 +17,10 @@
 "account_server_settings_protocol_type_label" = "Protocol";
 "account_server_settings_security_label" = "Use SSL/TLS";
 "account_server_settings_port_label" = "Port";
+"imap_text" = "Internet Mail Access Protocol";
+"imap" = "IMAP";
+"jmap" = "JMAP";
+"jmap_text" = "JSON Meta Application Protocol";
 "account_choose_email_type_label" = "Choose Email Account Type";
 "account_server_settings_server_label" = "Server";
 "account_incoming_server_label" = "Incoming Server";
@@ -27,6 +35,19 @@
 "account_server_settings_authentication_password_encrypted" = "Encrypted Password";
 "account_server_settings_authentication_client_oauth" = "OAuth 2.0";
 "account_server_settings_authentication_none" = "None";
+
+//In development strings
 "feature_not_implemented" = "This feature has not been implemented yet";
+"demo_button" = "Demo";
+
+// Other
 "next_button" = "Next";
 "donation_support" = "Donate";
+"close_button" = "Close";
+"all_remote_feature_flags" = "Allow remote feature flags";
+"inbox_header" = "Inbox";
+"sort_button" = "Sort";
+"has_attachments_sort_button" = "Attachments";
+"date_sort_button" = "Date";
+"read_status_sort_button" = "Read/Unread";
+"settings_button" = "Settings";
