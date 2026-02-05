@@ -36,66 +36,39 @@ struct EmailListView: View {
     var body: some View {
         NavigationStack {
             ZStack(alignment: .bottomTrailing) {
-                //Eventually will be a list of the email objects
-                List(tempEmails) { email in
-                    EmailCellView(email: email)
-                        .listRowSeparator(.hidden)
-                        .background {
-                            NavigationLink(value: email) {
-                                EmptyView()
-                            }.opacity(0)
-                        }
-                }.listStyle(.plain)
-                    .navigationDestination(for: TempEmail.self) { tempEmail in
-                        //Eventually will pass the email object
-                        ReadEmailView(
-                            tempEmail
-                        )
-                    }
-                    .navigationTitle("inbox_header")
-                    .toolbar {
-                        ToolbarItem(placement: .topBarTrailing) {
-                            Menu {
-                                Button(
-                                    "date_sort_button",
-                                    action: {
-                                        sortEmails()
-                                    })
-                                Button(
-                                    "read_status_sort_button",
-                                    action: {
-                                        sortEmails()
-                                    })
-                                Button(
-                                    "has_attachments_sort_button",
-                                    action: {
-                                        sortEmails()
-                                    })
-                            } label: {
-                                Label("sort_button", systemImage: "line.3.horizontal.decrease", )
+                if tempEmails.isEmpty {
+                    VStack {
+                        Text("empty_inbox")
+                            .padding(.bottom, 5)
+                        Text("new_messages_will_appear")
+                            .padding(.bottom, 10)
+                        Button {
+
+                        } label: {
+                            Text("add_another_account")
+                        }.buttonBorderShape(.capsule)
+                            .buttonStyle(.bordered)
+                            .foregroundStyle(.black)
+                        Spacer()
+                    }.frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else {
+                    List(tempEmails) { email in
+                        EmailCellView(email: email)
+                            .listRowSeparator(.hidden)
+                            .background {
+                                NavigationLink(value: email) {
+                                    EmptyView()
+                                }.opacity(0)
                             }
+                    }.listStyle(.plain)
+                        .navigationDestination(for: TempEmail.self) { tempEmail in
+                            //Eventually will pass the email object
+                            ReadEmailView(
+                                tempEmail
+                            )
                         }
-                        ToolbarItem(placement: .topBarTrailing) {
-                            Menu {
-                                Button(
-                                    "account_sign_out_button",
-                                    action: {
-                                        accounts.deleteAccounts()
-                                    })
-                                Button(
-                                    "donation_support",
-                                    action: {
-                                        guard let url = URL(string: "https://www.thunderbird.net/en-US/donate/") else { return }
-                                        openURL(url)
-                                    })
-                            } label: {
-                                Label("Options", systemImage: "ellipsis", )
-                            }
-                        }
-                        ToolbarItem(placement: .topBarTrailing) {
-                            NavigationLink("settings_button", destination: FeatureFlagDebugView())
-                        }
-                    }.scrollContentBackground(.hidden)
+                        .scrollContentBackground(.hidden)
+                }
                 Button {
                     // Action
                 } label: {
@@ -109,6 +82,50 @@ struct EmailListView: View {
                 }
                 .background(.clear)
                 .padding()
+            }
+            .navigationTitle("inbox_header")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Menu {
+                        Button(
+                            "date_sort_button",
+                            action: {
+                                sortEmails()
+                            })
+                        Button(
+                            "read_status_sort_button",
+                            action: {
+                                sortEmails()
+                            })
+                        Button(
+                            "has_attachments_sort_button",
+                            action: {
+                                sortEmails()
+                            })
+                    } label: {
+                        Label("sort_button", systemImage: "line.3.horizontal.decrease", )
+                    }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Menu {
+                        Button(
+                            "account_sign_out_button",
+                            action: {
+                                accounts.deleteAccounts()
+                            })
+                        Button(
+                            "donation_support",
+                            action: {
+                                guard let url = URL(string: "https://www.thunderbird.net/en-US/donate/") else { return }
+                                openURL(url)
+                            })
+                    } label: {
+                        Label("options_button", systemImage: "ellipsis")
+                    }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    NavigationLink("settings_button", destination: FeatureFlagDebugView())
+                }
             }
         }
 
