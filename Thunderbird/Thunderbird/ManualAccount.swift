@@ -24,7 +24,7 @@ struct ManualAccount: View {
                 .toolbar {
                     ToolbarItem(id: "navBar", placement: .cancellationAction) {
                         Button(
-                            "Close", systemImage: "xmark",
+                            "close_button", systemImage: "xmark",
                             action: {
                                 dismiss()
                             })

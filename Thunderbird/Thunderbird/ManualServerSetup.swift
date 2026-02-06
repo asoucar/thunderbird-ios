@@ -70,7 +70,7 @@ struct ManualServerSetup: View {
 
                     TextEntryWrapper("account_server_settings_server_label", "server.example.com", $incomingHostname)
                     NumEntryWrapper("account_server_settings_port_label", "443", $incomingPort)
-                    Picker("Authentication Type", selection: $incomingServer.authenticationType) {
+                    Picker("account_server_settings_authentication_label", selection: $incomingServer.authenticationType) {
                         ForEach(AuthenticationType.allCases) { authentication in
                             Text(authentication.text)
                                 .tag(authentication)
