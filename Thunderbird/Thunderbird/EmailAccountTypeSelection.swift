@@ -24,8 +24,8 @@ struct EmailAccountTypeSelection: View {
             Text("account_server_settings_protocol_type_label").listRowSeparator(.hidden)
             //            Toggle(isOn: $selectedJMAP) {
             //                VStack(alignment: .leading) {
-            //                    Text("JMAP")
-            //                    Text("JSON Meta Application Protocol")
+            //                    Text("jmap")
+            //                    Text("jmap_text")
             //                }
             //            }
             //            .simultaneousGesture(
@@ -37,8 +37,8 @@ struct EmailAccountTypeSelection: View {
             //            .listRowSeparator(.hidden)
             Toggle(isOn: $selectedIMAP) {
                 VStack(alignment: .leading) {
-                    Text("IMAP")
-                    Text("Internet Mail Access Protocol")
+                    Text("imap")
+                    Text("imap_text")
                 }
             }
             .simultaneousGesture(
