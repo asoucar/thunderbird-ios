@@ -5,9 +5,9 @@ extension URLSession {
     /// Post methods to JMAP service.
     /// - Parameter methods: One or more ``Method``s for JMAP service to perform
     /// - Parameter url: API endpoint URL from ``Session``
-    /// - Parameter token: OAuth bearer token to authenticate with service provider
+    /// - Parameter authorization: ``Authorization`` credentials or token for request header
     /// - Returns: ``MethodResponse``
-    public func jmapAPI(_ methods: [any Method], url: URL, authorization: String) async throws -> [any MethodResponse] {
+    public func jmapAPI(_ methods: [any Method], url: URL, authorization: Authorization) async throws -> [any MethodResponse] {
         let data: Data = try await data(for: try .jmapAPI(methods, url: url, authorization: authorization)).0
         let object: Any = try JSONSerialization.jsonObject(with: data)
 
@@ -83,11 +83,18 @@ extension URLSession {
     }
 
     /// Get JMAP session object from a service provider.
-    /// - Parameter host: Host name of the JMAP service provider; e.g., `api.fastmail.com`
-    /// - Parameter token: OAuth bearer token to authenticate with service provider
+    /// - Parameter server: ``Server`` configuration for JMAP service provider
     /// - Returns: ``Session`` object containing available account(s), capabilities and service URLs
-    public func jmapSession(_ host: String, port: Int? = nil, authorization: String) async throws -> Session {
-        let response: (Data, URLResponse) = try await data(for: try .jmapSession(host, port: port, authorization: authorization))
+    public func jmapSession(server: Server) async throws -> Session {
+        try await jmapSession(host: server.host, port: server.port, authorization: server.authorization ?? .empty)
+    }
+
+    /// Get JMAP session object from a service provider.
+    /// - Parameter host: Host name of the JMAP service provider; e.g., `api.fastmail.com`
+    /// - Parameter authorization: ``Authorization`` credentials or token for request header
+    /// - Returns: ``Session`` object containing available account(s), capabilities and service URLs
+    public func jmapSession(host: String, port: Int? = nil, authorization: Authorization) async throws -> Session {
+        let response: (Data, URLResponse) = try await data(for: try .jmapSession(host: host, port: port, authorization: authorization))
         switch (response.1 as? HTTPURLResponse)?.statusCode {
         case 401:
             throw URLError(.userAuthenticationRequired)

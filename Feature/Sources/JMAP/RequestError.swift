@@ -1,5 +1,7 @@
 /// Request-level configuration errors, part of [JMAP core](https://jmap.io/spec-core.html#errors)
 public struct RequestError: Error, Decodable, CustomStringConvertible {
+
+    /// Enumerated error code derived from `type` raw value
     public enum Code: String, CaseIterable, Codable, CustomStringConvertible, Identifiable, Sendable {
         case limit = "urn:ietf:params:jmap:error:limit"
         case notJSON = "urn:ietf:params:jmap:error:notJSON"
@@ -7,19 +9,32 @@ public struct RequestError: Error, Decodable, CustomStringConvertible {
         case unknownCapability = "urn:ietf:params:jmap:error:unknownCapability"
 
         // MARK: CustomStringConvertible
-        public var description: String { rawValue.components(separatedBy: ":").last! }
+        public var description: String {
+            switch self {
+            case .limit: "Limit"
+            case .notJSON: "Not JSON"
+            case .notRequest: "Not request"
+            case .unknownCapability: "Unknown capability"
+            }
+        }
 
         // MARK: Identifiable
         public var id: String { rawValue }
     }
 
     public let code: Code
+    public let detail: String
+
+    init(_ code: Code, detail: String = "") {
+        self.code = code
+        self.detail = detail
+    }
 
     // MARK: Decodable
     public init(from decoder: any Decoder) throws {
         let container: KeyedDecodingContainer<Key> = try decoder.container(keyedBy: Key.self)
         code = try container.decode(Code.self, forKey: .type)
-        description = try container.decode(String.self, forKey: .detail)
+        detail = try container.decode(String.self, forKey: .detail)
     }
 
     private enum Key: CodingKey {
@@ -27,5 +42,5 @@ public struct RequestError: Error, Decodable, CustomStringConvertible {
     }
 
     // MARK: CustomStringConvertible
-    public let description: String
+    public var description: String { "\(code)\(detail.isEmpty ? "" : "; \(detail)")" }
 }

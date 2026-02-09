@@ -4,6 +4,7 @@ import Foundation
 public protocol Method: Identifiable {
     static var name: String { get }
     var accountID: String { get }
+    /// Default implementation: `[.core, .mail]`
     var using: [Capability.Key] { get }
     var object: [Any] { get }
 

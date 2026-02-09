@@ -7,31 +7,31 @@ struct URLRequestTests {
         let request: URLRequest = try .jmapAPI(
             [
                 Mailbox.GetMethod("u7a51e404")
-            ], url: url, authorization: "Bearer fmu1-1e911257e86b1f194daa-0-a89faae5c11f")
+            ], url: url, authorization: .bearer("fmu1-1e911257e86b1f194daa-0-a89faae5c11f"))
         #expect(request.value(forHTTPHeaderField: "Authorization") == "Bearer fmu1-1e911257e86b1f194daa-0-a89faae5c11f")
         #expect(request.httpMethod == "POST")
         #expect(request.httpBody?.count ?? 0 > 100)
         #expect(throws: Error.self) {
-            try URLRequest.jmapAPI([], url: url, authorization: "Bearer fmu1-1e911257e86b1f194daa-0-a89faae5c11f")
+            try URLRequest.jmapAPI([], url: url, authorization: .bearer("fmu1-1e911257e86b1f194daa-0-a89faae5c11f"))
         }
         #expect(throws: Error.self) {
             try URLRequest.jmapAPI(
                 [
                     Mailbox.GetMethod("u7a51e404")
-                ], url: url, authorization: "")
+                ], url: url, authorization: .bearer(""))
         }
     }
 
     @Test func jmapSession() throws {
-        let request: URLRequest = try .jmapSession(url.host()!, authorization: "Bearer fmu1-1e911257e86b1f194daa-0-a89faae5c11f")
-        #expect(request.url?.absoluteString == "https://api.fastmail.com/jmap/session")
+        let request: URLRequest = try .jmapSession(host: url.host()!, authorization: .bearer("fmu1-1e911257e86b1f194daa-0-a89faae5c11f"))
+        #expect(request.url?.absoluteString == "https://api.example.com/jmap/session")
         #expect(request.value(forHTTPHeaderField: "Authorization") == "Bearer fmu1-1e911257e86b1f194daa-0-a89faae5c11f")
         #expect(request.httpMethod == "GET")
     }
 
     @Test func setAuthorization() throws {
         var request: URLRequest = URLRequest(url: url)
-        try request.setAuthorization("Bearer fmu1-1e911257e86b1f194daa-0-a89faae5c11f")
+        request.setAuthorization(.bearer("fmu1-1e911257e86b1f194daa-0-a89faae5c11f"))
         #expect(request.value(forHTTPHeaderField: "Authorization") == "Bearer fmu1-1e911257e86b1f194daa-0-a89faae5c11f")
     }
 
@@ -61,4 +61,4 @@ struct URLRequestTests {
     }
 }
 
-private let url: URL = URL(string: "https://api.fastmail.com/jmap/api/")!
+private let url: URL = URL(string: "https://api.example.com/jmap/api/")!

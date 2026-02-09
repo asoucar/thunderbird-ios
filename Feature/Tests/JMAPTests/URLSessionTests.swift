@@ -3,17 +3,20 @@ import Foundation
 import Testing
 
 struct URLSessionTests {
-    @Test(.disabled(if: token.isEmpty)) func jmapAPI() async throws {
-        let session: Session = try await URLSession.shared.jmapSession("api.fastmail.com", port: 443, authorization: "Bearer \(token)")
+    @Test(arguments: Server.allCases(disabled: false)) func jmapAPI(server: Server) async throws {
+        let session: Session = try await URLSession.shared.jmapSession(server: server)
         guard let accountID: String = session.accounts.keys.first else {
             throw MethodError.accountNotFound
         }
+        guard let authorization: Authorization = server.authorization else {
+            throw URLError(.userAuthenticationRequired)
+        }
         let responses: [any MethodResponse] = try await URLSession.shared.jmapAPI(
             [
-                Mailbox.GetMethod(accountID)  // Test with ccount-agnostic method
+                Mailbox.GetMethod(accountID)  // Test with account-agnostic method
             ],
             url: session.apiURL,
-            authorization: "Bearer \(token)"
+            authorization: authorization
         )
         try #require(responses.count == 1)
         guard let response: MethodGetResponse = responses.first as? MethodGetResponse else {
@@ -24,15 +27,8 @@ struct URLSessionTests {
         #expect(mailboxes.compactMap { $0.role }.contains(.inbox) == true)
     }
 
-    @Test(.disabled(if: token.isEmpty)) func jmapSession() async throws {
-        let session: Session = try await URLSession.shared.jmapSession("api.fastmail.com", port: 443, authorization: "Bearer \(token)")
-        #expect(session.username.hasSuffix("@fastmail.com") == true)
+    @Test(arguments: Server.allCases(disabled: false)) func jmapSession(server: Server) async throws {
+        let session: Session = try await URLSession.shared.jmapSession(server: server)
+        print(session)
     }
 }
-
-// Catch when token is being leaked
-@Test func emptyToken() {
-    #expect(token == "")
-}
-
-private let token: String = ""

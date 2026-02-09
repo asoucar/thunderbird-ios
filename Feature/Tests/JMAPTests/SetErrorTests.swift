@@ -4,7 +4,7 @@ import Testing
 
 struct SetErrorTests {
     @Test func valueInit() throws {
-        #expect(SetError(try JSONSerialization.jsonObject(with: data)) == .invalidProperties)
+        #expect(SetError(data) == .invalidProperties)
     }
 }
 

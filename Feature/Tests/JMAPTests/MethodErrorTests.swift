@@ -3,6 +3,8 @@ import Foundation
 import Testing
 
 struct MethodErrorTests {
+
+    // MARK: Decodable
     @Test func decoderInit() throws {
         let errors: [MethodError] = try JSONDecoder().decode([MethodError].self, from: data)
         try #require(errors.count == 2)
