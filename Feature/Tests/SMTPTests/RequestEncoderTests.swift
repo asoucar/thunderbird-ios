@@ -1,4 +1,3 @@
-import MIME
 import NIOCore
 @testable import SMTP
 import Testing

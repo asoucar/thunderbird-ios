@@ -1,29 +1,35 @@
 import NIOCore
 import NIOIMAP
 
-// Fetch advertised server capabilities
-// https://www.iana.org/assignments/imap-capabilities/imap-capabilities.xhtml
-struct CapabilityCommand: IMAPCommand {
+// Fetch status (message counts) for given mailbox
+struct StatusCommand: IMAPCommand {
+    let mailboxName: MailboxName
+    let attributes: [MailboxAttribute]
+
+    init(_ mailboxName: MailboxName, attributes: [MailboxAttribute] = .standard) {
+        self.mailboxName = mailboxName
+        self.attributes = attributes
+    }
 
     // MARK: IMAPCommand
-    typealias Result = [Capability]
-    typealias Handler = CapabilityHandler
+    typealias Result = MailboxStatus
+    typealias Handler = StatusHandler
 
-    var name: String { "capability" }
+    var name: String { "status \"\(mailboxName)\"" }
 
     func tagged(_ tag: String) -> NIOIMAPCore.TaggedCommand {
-        TaggedCommand(tag: tag, command: .capability)
+        TaggedCommand(tag: tag, command: .status(mailboxName, attributes))
     }
 }
 
-class CapabilityHandler: IMAPCommandHandler, @unchecked Sendable {
+class StatusHandler: IMAPCommandHandler, @unchecked Sendable {
 
     // MARK: IMAPCommandHandler
     typealias InboundIn = Response
     typealias InboundOut = Response
-    typealias Result = [Capability]
+    typealias Result = MailboxStatus
 
-    var capabilities: Result = []
+    var status: MailboxStatus = MailboxStatus()
     var clientBug: String? = nil
     let promise: EventLoopPromise<Result>
     let tag: String
@@ -42,12 +48,12 @@ class CapabilityHandler: IMAPCommandHandler, @unchecked Sendable {
             case .bad(let text), .no(let text):
                 promise.fail(IMAPError.commandFailed(text.text))
             case .ok:
-                promise.succeed(capabilities)
+                promise.succeed(status)
             }
         case .untagged(let payload):
             switch payload {
-            case .capabilityData(let capabilities):
-                self.capabilities = capabilities
+            case .mailboxData(.status(_, let status)):
+                self.status = status
             default:
                 break
             }
@@ -55,5 +61,15 @@ class CapabilityHandler: IMAPCommandHandler, @unchecked Sendable {
             break
         }
         context.fireChannelRead(data)
+    }
+}
+
+extension [MailboxAttribute] {
+    static var standard: Self {
+        [
+            .messageCount,
+            .recentCount,
+            .unseenCount
+        ]
     }
 }
