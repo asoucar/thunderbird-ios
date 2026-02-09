@@ -6,7 +6,7 @@ struct IMAPErrorTests {
 
     // MARK: CustomStringConvertible
     @Test func description() {
-        #expect(IMAPError.commandFailed("capability command").description == "Capability command failed")
+        #expect(IMAPError.commandFailed("CAPABILITY failed.").description == "CAPABILITY failed.")
         #expect(IMAPError.commandFailed(CapabilityCommand()).description == "Capability command failed")
         #expect(IMAPError.commandNotSupported("capability command").description == "Capability command not supported")
         #expect(IMAPError.commandNotSupported(CapabilityCommand()).description == "Capability command not supported")

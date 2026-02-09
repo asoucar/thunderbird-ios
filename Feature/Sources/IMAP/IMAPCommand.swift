@@ -7,13 +7,12 @@ import NIOIMAP
 protocol IMAPCommand: CustomStringConvertible, Equatable where Result: Sendable {
     associatedtype Result
     associatedtype Handler: IMAPCommandHandler where Handler.Result == Result
-    static var name: String { get }
+    var name: String { get }
     var timeout: Int64 { get }  // Seconds
     func tagged(_ tag: String) -> TaggedCommand  // NIOIMAP command
 }
 
 extension IMAPCommand {
-    var name: String { Self.name }
 
     // MARK: IMAPCommand
     var timeout: Int64 { 30 }  // Practical default

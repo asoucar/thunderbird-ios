@@ -1,47 +1,27 @@
+import EmailAddress
 import Foundation
 import MIME
 @testable import SMTP
 import Testing
 
 struct SMTPClientTests {
-    @Test(.disabled(if: Server.server.password.isEmpty)) func send() async throws {
-        try await SMTPClient(.server).send(.email)
-    }
-
-    @Test(.disabled(if: Server.server.password.isEmpty)) func sendToRecipient() async throws {
-        try await SMTPClient(.server).send(.email, to: "recipient@example.com")
+    @Test(arguments: Server.allCases(disabled: false)) func send(server: Server) async throws {
+        try await SMTPClient(server).send(.email(EmailAddress(server.username)))
     }
 }
 
 private extension Email {
-    static var email: Self {
+    static func email(_ address: EmailAddress) -> Self {
         Self(
-            sender: "sender@example.com",
+            sender: address,
             recipients: [
-                "recipient@example.com"
+                address  // Send to self
             ],
             subject: "Example email subject",
             body: try! Body(parts: [
                 Part(data: "For a brief period of time, email body contents were made of plain, ASCII text only :)".data(using: .ascii)!, contentType: .text(.plain, .ascii))
             ]),
             id: UUID(uuidString: "A51D5B17-CA61-4FF1-A4A8-C717289B8F9E")!
-        )
-    }
-}
-
-// Catch when password is being leaked
-@Test func emptyPassword() {
-    #expect(Server.server.password == "")
-}
-
-private extension Server {
-    static var server: Self {
-        Self(
-            .startTLS,
-            hostname: "",
-            username: "",
-            password: "",
-            port: 587
         )
     }
 }

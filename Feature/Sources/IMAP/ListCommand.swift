@@ -1,29 +1,35 @@
 import NIOCore
 import NIOIMAP
 
-// Fetch advertised server capabilities
-// https://www.iana.org/assignments/imap-capabilities/imap-capabilities.xhtml
-struct CapabilityCommand: IMAPCommand {
+// List all mailboxes available for authenticated user
+struct ListCommand: IMAPCommand {
+    let options: [ReturnOption]
+    let wildcard: Character
+
+    init(options: [ReturnOption] = [], wildcard: Character) {
+        self.options = options
+        self.wildcard = wildcard
+    }
 
     // MARK: IMAPCommand
-    typealias Result = [Capability]
-    typealias Handler = CapabilityHandler
+    typealias Result = [MailboxInfo]
+    typealias Handler = ListHandler
 
-    var name: String { "capability" }
+    var name: String { "list" }
 
     func tagged(_ tag: String) -> NIOIMAPCore.TaggedCommand {
-        TaggedCommand(tag: tag, command: .capability)
+        TaggedCommand(tag: tag, command: .list(nil, reference: .reference, .mailbox(wildcard), options))
     }
 }
 
-class CapabilityHandler: IMAPCommandHandler, @unchecked Sendable {
+class ListHandler: IMAPCommandHandler, @unchecked Sendable {
 
     // MARK: IMAPCommandHandler
     typealias InboundIn = Response
     typealias InboundOut = Response
-    typealias Result = [Capability]
+    typealias Result = [MailboxInfo]
 
-    var capabilities: Result = []
+    var mailboxes: Result = []
     var clientBug: String? = nil
     let promise: EventLoopPromise<Result>
     let tag: String
@@ -42,12 +48,12 @@ class CapabilityHandler: IMAPCommandHandler, @unchecked Sendable {
             case .bad(let text), .no(let text):
                 promise.fail(IMAPError.commandFailed(text.text))
             case .ok:
-                promise.succeed(capabilities)
+                promise.succeed(mailboxes)
             }
         case .untagged(let payload):
             switch payload {
-            case .capabilityData(let capabilities):
-                self.capabilities = capabilities
+            case .mailboxData(.list(let mailbox)):
+                mailboxes.append(mailbox)
             default:
                 break
             }
@@ -55,5 +61,15 @@ class CapabilityHandler: IMAPCommandHandler, @unchecked Sendable {
             break
         }
         context.fireChannelRead(data)
+    }
+}
+
+extension MailboxName {
+    static var reference: Self { Self(ByteBuffer(string: "")) }
+}
+
+extension MailboxPatterns {
+    static func mailbox(_ wildcard: Character = .wildcard) -> Self {
+        .mailbox(ByteBuffer(string: "\(wildcard)"))
     }
 }
