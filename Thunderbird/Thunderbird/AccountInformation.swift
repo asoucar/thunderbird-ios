@@ -92,6 +92,30 @@ struct AccountInformation: View {
                     .listRowSeparator(.hidden)
                     .buttonStyle(.plain)
             }
+            //TEMP DEMO BUTTON
+            Button(
+                action: {
+                    account = Account("demoEmail.gmail.com", provider: config?.emailProvider)
+                    guard var account = account else { return }
+                    let incomingServer = Server(.imap)
+                    loginServer = incomingServer
+                    var incomingServerInfo = account.incomingServer?.clone() ?? Server(.imap)
+                    var outgoingServerInfo = account.outgoingServer?.clone() ?? Server(.smtp)
+                    incomingServerInfo.authorization = loginServer.authorization
+                    outgoingServerInfo.authorization = loginServer.authorization
+                    account.servers = [incomingServerInfo, outgoingServerInfo]
+                    accounts.set(account)
+
+                }) {
+                    Text("Demo")
+                        .padding(5.5)
+                        .frame(maxWidth: .infinity)
+                        .underline()
+
+                }
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
+                .buttonStyle(.borderedProminent)
         }
         .onChange(of: emailAddress, initial: true) {
             refreshAccount()
