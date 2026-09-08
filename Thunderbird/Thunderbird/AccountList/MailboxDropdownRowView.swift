@@ -25,7 +25,7 @@ struct MailboxDropdownRowView: View {
                         .foregroundStyle(.black)
                     Spacer()
                     if (!isExpanded && folder.unreadEmails! > 0) {
-                        UnreadCounter(unreadCount: folder.unreadEmails!, hasNew: false)
+                        UnreadCounter(unreadCount: folder.aggregatedUnreadCount(), hasNew: false)
                     }
                 }
             }.font(.subheadline)
@@ -37,7 +37,7 @@ struct MailboxDropdownRowView: View {
                     .foregroundStyle(.black)
                 Spacer()
                 if folder.unreadEmails! > 0 {
-                    UnreadCounter(unreadCount: folder.unreadEmails!, hasNew: false)
+                    UnreadCounter(unreadCount: folder.aggregatedUnreadCount(), hasNew: false)
                 }
             }
             .onTapGesture {
